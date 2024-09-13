@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.11 (WavToBinTest)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (WavToBinTest)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (ElGamal_Audio_Encryptor)" project-jdk-type="Python SDK" />
 </project>

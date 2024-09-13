@@ -18,11 +18,11 @@ def wav_to_bytes(input_wav_path, output_bin_path):
 # Main function
 def main():
     # Input WAV file path
-    input_path = input("Please enter the path of wav file: \n")
+    input_path = input('Please enter the path of wav file:(end with .wav) \n')
     input_wav_path = input_path  # Replace 'input.wav' with your WAV file path
 
     # Output binary file path
-    output_path = input("Please enter the path of the output: \n")
+    output_path = input("Please enter the path of the output:(end with \) \n")
     output_bin_path = output_path + 'output_audio.bin'  # Replace 'output_audio.bin' with your desired binary file path
 
     # Convert WAV file to byte file

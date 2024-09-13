@@ -27,17 +27,17 @@ def bytes_to_wav(input_bin_path, output_wav_path, frame_rate, sample_width=2, ch
 # 主函数
 def main():
     # Input binary file path
-    input_path = input("Please enter the input path of binary file: \n")
+    input_path = input("Please enter the input path of binary file:(end with .bin) \n")
     input_bin_path = input_path  # Replace 'output_audio.bin' with your input file path
 
     # Output WAV file path
-    output_path = input("Please enter the output path of wav file: \n")
+    output_path = input("Please enter the output path of wav file:(end with \) \n")
     output_wav_path = output_path + 'reconstructed.wav'  # Replace 'reconstructed.wav' with your output WAV file path
 
     # Set audio parameters
-    frame_rate = 44100  # Replace with the frame rate of your original audio
-    sample_width = 4  # Replace with the sample width (bytes) of your original audio
-    channels = 2  # Replace with the number of channels in your original audio
+    frame_rate = 44100  # Frame rate of your original audio (Normally it's 44100)
+    sample_width = 2  # Sample width (bytes) of your original audio (Normally it's 2 for 16bits audio)
+    channels = 2  # Number of channels in your original audio (2 means stereo)
 
     # Convert binary file to WAV file
     bytes_to_wav(input_bin_path, output_wav_path, frame_rate, sample_width, channels)
