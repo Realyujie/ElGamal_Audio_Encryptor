@@ -2,106 +2,106 @@ import wave
 import numpy as np
 import pickle
 
-# 1. 读取加密数据
+# 1. Load encrypted data
 def load_encrypted_data(file_path):
     with open(file_path, 'rb') as f:
         data = pickle.load(f)
     return data
 
-# 2. 读取私钥
+# 2. Load private key
 def load_private_key(file_path):
     with open(file_path, 'rb') as f:
         private_key = pickle.load(f)
     return private_key
 
-# 3. 解密
+# 3. Decryption
 def decrypt_blocks(private_key, public_key, encrypted_blocks, block_size):
     p, g, y = public_key
     x = private_key
     decrypted_blocks = []
     for a, b in encrypted_blocks:
         s = pow(a, x, p)
-        # 计算 s 在模 p 下的乘法逆元
+        # Calculate the modular inverse of s modulo p
         try:
             s_inv = pow(s, -1, p)
         except ValueError:
-            # 如果 s 与 p 不是互质，无法计算逆元
-            raise ValueError("无法计算乘法逆元，解密失败。")
+            # If s and p are not coprime, cannot compute inverse
+            raise ValueError("Cannot compute multiplicative inverse, decryption failed.")
         m = (b * s_inv) % p
-        # 将整数 m 转换回字节串，使用固定的字节长度
-        block_bytes = m.to_bytes(block_size * 2, byteorder='big', signed=False)  # 改为固定字节长度，signed=False
+        # Convert integer m back to bytes using fixed byte length
+        block_bytes = m.to_bytes(block_size * 2, byteorder='big', signed=False)  # # Use fixed byte length, signed=False
         decrypted_blocks.append(block_bytes)
     return decrypted_blocks
 
-# 4. 拼接并转换音频数据
+# 4. Reconstruct and convert audio data
 def reconstruct_audio_data(decrypted_blocks, block_size, total_samples):
     audio_data = b''.join(decrypted_blocks)
-    # 将字节串转换为 numpy 数组
+    # Convert byte string to numpy array
     audio_data = np.frombuffer(audio_data, dtype=np.int16)
-    # 截断到原始长度
+    # Truncate to original length
     audio_data = audio_data[:total_samples]
     return audio_data
 
-# 5. 保存解密后的 WAV 文件
+# 5. Save decrypted WAV file
 def write_wav(file_path, params, audio_data):
     audio_data_bytes = audio_data.astype(np.int16).tobytes()
     with wave.open(file_path, 'wb') as wav_file:
         wav_file.setparams(params)
         wav_file.writeframes(audio_data_bytes)
 
-# 验证解密结果
+# Validate decryption result
 # def validate_decryption(original_audio_file, decrypted_audio_file):
-#     # 读取原始音频数据
+#     # Read original audio data
 #     params_orig, audio_data_orig = read_wav(original_audio_file)
-#     # 读取解密后的音频数据
+#     # Read decrypted audio data
 #     params_decrypted, audio_data_decrypted = read_wav(decrypted_audio_file)
-#     # 比较音频数据
+#     # Compare original and decrypted audio data
 #     if np.array_equal(audio_data_orig, audio_data_decrypted):
-#         print("验证成功：解密后的音频与原始音频一致。")
+#         print("Verification successful: the decrypted audio is same with the original audio.")
 #     else:
-#         print("验证失败：解密后的音频与原始音频不一致。")
+#         print("Authentication failed: The decrypted audio is different with the original audio.")
 
-# 读取 WAV 文件（用于验证）
+# Read WAV file (used for validation)
 def read_wav(file_path):
     with wave.open(file_path, 'rb') as wav_file:
-        params = wav_file.getparams()  # 获取音频参数
+        params = wav_file.getparams()  # Get audio parameters
         frames = wav_file.readframes(params.nframes)
         audio_data = np.frombuffer(frames, dtype=np.int16)
     return params, audio_data
 
-# 6. 主流程
+# 6. Main process
 def main():
-    # 加密数据文件路径
+    # Encrypted data file path
     encrypted_file = 'encrypted_data.pkl'
-    # 私钥文件路径
+    # Private key file path
     private_key_file = 'private_key.pkl'
 
-    # 读取加密数据
+    # Load encrypted data
     data = load_encrypted_data(encrypted_file)
     encrypted_blocks = data['encrypted_blocks']
     params = data['params']
     block_size = data['block_size']
     public_key = data['public_key']
 
-    # 读取私钥
+    # Load private key
     private_key = load_private_key(private_key_file)
 
-    # 解密音频数据块
+    # Decrypt audio data blocks
     decrypted_blocks = decrypt_blocks(private_key, public_key, encrypted_blocks, block_size)
 
-    # 计算总采样点数
+    # Calculate total number of samples
     total_samples = params.nframes * params.nchannels
 
-    # 重构音频数据
+    # Reconstruct audio data
     audio_data = reconstruct_audio_data(decrypted_blocks, block_size, total_samples)
 
-    # 保存解密后的音频文件
+    # Save decrypted audio file
     output_file = 'decrypted_output.wav'
     write_wav(output_file, params, audio_data)
 
-    print(f"解密完成！解密后的音频文件已保存到 {output_file}")
+    print(f"Decryption complete! Decrypted audio file saved to {output_file}")
 
-    # 验证解密结果
+    # Validate decryption result
     # original_audio_file = 'input.wav'
     # validate_decryption(original_audio_file, output_file)
 

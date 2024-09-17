@@ -4,24 +4,24 @@ import secrets
 import pickle
 from sympy import randprime
 
-# 1. 读取 WAV 文件
+# 1. Read the wav file
 def read_wav(file_path):
     with wave.open(file_path, 'rb') as wav_file:
-        params = wav_file.getparams()  # 获取音频参数
+        params = wav_file.getparams()  # Get audio parameters
         frames = wav_file.readframes(params.nframes)
-        audio_data = np.frombuffer(frames, dtype=np.int16)  # 假设 16 位深度
+        audio_data = np.frombuffer(frames, dtype=np.int16)  # Assuming 16-bit depth
     return params, audio_data
 
-# 2. 分块处理音频数据
+# 2. Divide the audio_data to blocks
 def divide_into_blocks(audio_data, block_size):
-    num_blocks = (len(audio_data) + block_size - 1) // block_size  # 计算块数
+    num_blocks = (len(audio_data) + block_size - 1) // block_size  # Calculate block number
     blocks = []
     for i in range(num_blocks):
         block = audio_data[i * block_size : (i + 1) * block_size]
         blocks.append(block)
     return blocks
 
-# 3. 密钥生成
+# 3. Generate secrets
 def generate_large_prime(bit_length):
     lower_bound = 1 << (bit_length - 1)
     upper_bound = (1 << bit_length) - 1
@@ -29,33 +29,33 @@ def generate_large_prime(bit_length):
     return p
 
 def key_generation(block_bit_length):
-    p_bit_length = block_bit_length + 10  # p 的位长度比块的位长度大一些
+    p_bit_length = block_bit_length + 10  # p's bit length is slightly larger than block's bit length
     p = generate_large_prime(p_bit_length)
-    g = 2  # 选择生成元 g，可以是 2 或 3
-    x = secrets.randbelow(p - 2) + 1  # 私钥 x，1 < x < p - 1
-    y = pow(g, x, p)  # 公钥 y
+    g = 2  # Choose a generator g, could be 2 or 3
+    x = secrets.randbelow(p - 2) + 1  # Private key x, 1 < x < p - 1
+    y = pow(g, x, p)  # public key y
     public_key = (p, g, y)
     private_key = x
     return public_key, private_key
 
-# 4. 加密
+# 4. Encryption
 def encrypt_blocks(public_key, blocks):
     p, g, y = public_key
     encrypted_blocks = []
     for block in blocks:
-        # 将块转换为字节串，再转换为整数
+        # Convert block to bytes, then to integer
         block_bytes = block.tobytes()
-        m = int.from_bytes(block_bytes, byteorder='big', signed=False)  # 改为 signed=False
+        m = int.from_bytes(block_bytes, byteorder='big', signed=False)  # signed=False
         if m >= p:
-            raise ValueError("明文 m 必须小于素数 p")
-        # 加密
-        k = secrets.randbelow(p - 2) + 1  # 随机数 k，1 < k < p - 1
+            raise ValueError("Plaintext m must be less than prime p")
+        # Encrypt
+        k = secrets.randbelow(p - 2) + 1  # Random number k，1 < k < p - 1
         a = pow(g, k, p)
         b = (pow(y, k, p) * m) % p
         encrypted_blocks.append((a, b))
     return encrypted_blocks
 
-# 5. 保存加密后的数据
+# 5. Save encrypted data
 def save_encrypted_data(file_path, encrypted_blocks, params, block_size, public_key):
     data = {
         'encrypted_blocks': encrypted_blocks,
@@ -66,42 +66,42 @@ def save_encrypted_data(file_path, encrypted_blocks, params, block_size, public_
     with open(file_path, 'wb') as f:
         pickle.dump(data, f)
 
-# **新增**：保存私钥
+# Save private key as file
 def save_private_key(file_path, private_key):
     with open(file_path, 'wb') as f:
         pickle.dump(private_key, f)
 
-# 6. 主流程
+# 6. Main process
 def main():
-    # 设置块大小（采样点数量）
-    block_size = 16  # 可以根据需求调整
+    # Set block size (number of samples)
+    block_size = 16  # Change as needed
 
-    # 读取原始音频文件
-    input_file = 'input.wav'  # 输入的 WAV 文件路径
+    # Read the original audio file
+    input_file = 'input.wav'  # Input audio file path
     params, audio_data = read_wav(input_file)
 
-    # 分块处理音频数据
+    # Divide audio into blocks
     blocks = divide_into_blocks(audio_data, block_size)
 
-    # 计算每个块的位长度
-    block_bit_length = 16 * block_size  # 每个采样点 16 位
+    # Calculate bit length of each block
+    block_bit_length = 16 * block_size  # 16 bits per sample
 
-    # 密钥生成
+    # Key generation
     public_key, private_key = key_generation(block_bit_length)
 
-    # 加密音频数据块
+    # Encrypt audio data blocks
     encrypted_blocks = encrypt_blocks(public_key, blocks)
 
-    # 保存加密后的数据
-    output_file = 'encrypted_data.pkl'  # 输出的加密文件路径
+    # Save encrypted data
+    output_file = 'encrypted_data.pkl'  # Encrypted file output path
     save_encrypted_data(output_file, encrypted_blocks, params, block_size, public_key)
 
-    # 保存私钥到单独的文件
+    # Save private key to a separate file
     private_key_file = 'private_key.pkl'
     save_private_key(private_key_file, private_key)
 
-    print(f"加密完成！加密数据已保存到 {output_file}")
-    print(f"私钥已保存到 {private_key_file}，请妥善保管！")
+    print(f"Encryption completed! The encrypted file has been save to {output_file}")
+    print(f"Private key has been save to {private_key_file}")
 
 if __name__ == '__main__':
     main()
