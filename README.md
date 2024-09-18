@@ -23,5 +23,10 @@ Ensure you have the following Python packages installed:
 ## Attention
 Do not change the audio configurations (parameters) part, it has already been tested by Yujie and it works well.
 
-## TODO
-None
+## About audio parameters
+For example, a 44.1kHz frequency, 16bits depth audio:  
+- 44100 times of sampling rate per second
+- Each sample is represented using 16 bits of binary
+- 2^16 = 65,536 possible values. The actual range is -32,768 to +32,767 (because 0 is included).
+- Each sample takes up 2 bytes. One second of audio data takes up: 44,100 * 2 = 88,200 bytes ≈ 86.13 KB.
+- For stereo, it's 172.27 KB/second
