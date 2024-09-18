@@ -1,6 +1,7 @@
 import wave
 import numpy as np
 import pickle
+import validate
 
 # 1. Load encrypted data
 def load_encrypted_data(file_path):
@@ -49,32 +50,12 @@ def write_wav(file_path, params, audio_data):
         wav_file.setparams(params)
         wav_file.writeframes(audio_data_bytes)
 
-# Validate decryption result
-# def validate_decryption(original_audio_file, decrypted_audio_file):
-#     # Read original audio data
-#     params_orig, audio_data_orig = read_wav(original_audio_file)
-#     # Read decrypted audio data
-#     params_decrypted, audio_data_decrypted = read_wav(decrypted_audio_file)
-#     # Compare original and decrypted audio data
-#     if np.array_equal(audio_data_orig, audio_data_decrypted):
-#         print("Verification successful: the decrypted audio is same with the original audio.")
-#     else:
-#         print("Authentication failed: The decrypted audio is different with the original audio.")
-
-# Read WAV file (used for validation)
-def read_wav(file_path):
-    with wave.open(file_path, 'rb') as wav_file:
-        params = wav_file.getparams()  # Get audio parameters
-        frames = wav_file.readframes(params.nframes)
-        audio_data = np.frombuffer(frames, dtype=np.int16)
-    return params, audio_data
-
 # 6. Main process
 def main():
     # Encrypted data file path
-    encrypted_file = 'encrypted_data.pkl'
+    encrypted_file = 'encrypted_data.bin'
     # Private key file path
-    private_key_file = 'private_key.pkl'
+    private_key_file = 'private_key.bin'
 
     # Load encrypted data
     data = load_encrypted_data(encrypted_file)
@@ -99,11 +80,10 @@ def main():
     output_file = 'decrypted_output.wav'
     write_wav(output_file, params, audio_data)
 
-    print(f"Decryption complete! Decrypted audio file saved to {output_file}")
+    print(f"\nDecryption complete! Decrypted audio file saved to {output_file}")
 
-    # Validate decryption result
-    # original_audio_file = 'input.wav'
-    # validate_decryption(original_audio_file, output_file)
+    original_file = 'input.wav'  # Path to the original audio file
+    validate.validate_decryption(original_file, output_file)
 
 if __name__ == '__main__':
     main()
