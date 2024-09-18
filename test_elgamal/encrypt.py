@@ -2,7 +2,9 @@ import wave
 import numpy as np
 import secrets
 import pickle
-from sympy import randprime
+import math
+import random
+from sympy import *
 
 # 1. Read the wav file
 def read_wav(file_path):
@@ -25,21 +27,40 @@ def divide_into_blocks(audio_data, block_size):
     return blocks
 
 # 3. Generate secrets
-def generate_large_prime(bit_length):
-    lower_bound = 1 << (bit_length - 1)
-    upper_bound = (1 << bit_length) - 1
-    p = randprime(lower_bound, upper_bound)
+def generate_prime_candidate(bits):
+    p = random.getrandbits(bits)
+    p |= (1 << bits - 1) | 1  # Make sure it's odd and has the right number of bits
     return p
 
-def key_generation(block_bit_length):
-    p_bit_length = block_bit_length + 10  # p's bit length is slightly larger than block's bit length
-    p = generate_large_prime(p_bit_length)
-    g = 2  # Choose a generator g, could be 2 or 3
-    x = secrets.randbelow(p - 2) + 1  # Private key x, 1 < x < p - 1
-    y = pow(g, x, p)  # public key y = g^x mod p
-    public_key = (p, g, y)
-    private_key = x
-    return public_key, private_key
+def generate_large_prime(bits):
+    p = generate_prime_candidate(bits)
+    while not isprime(p):
+        p += 2
+    return p
+
+def generate_safe_prime(bits):
+    while True:
+        q = generate_large_prime(bits - 1)
+        p = 2 * q + 1
+        if isprime(p):
+            return p, q
+
+def find_generator(p, q):
+    while True:
+        g = random.randint(2, p-1)
+        if pow(g, 2, p) != 1 and pow(g, q, p) != 1:
+            return g
+
+def key_generation(bits):
+    p, q = generate_safe_prime(bits)
+    g = find_generator(p, q)
+    x = random.randint(2, p-2)  # private key
+    y = pow(g, x, p)  # public key
+    print(p)
+    print(q)
+    print(x)
+    print(y)
+    return (p, g, y), x
 
 # 4. Encryption
 def encrypt_blocks(public_key, blocks):
@@ -92,7 +113,7 @@ def main():
     block_bit_length = 16 * block_size  # 16 bits per sample
 
     # Key generation
-    public_key, private_key = key_generation(block_bit_length)
+    public_key, private_key = key_generation(512)
 
     # Encrypt audio data blocks
     encrypted_blocks = encrypt_blocks(public_key, blocks)
