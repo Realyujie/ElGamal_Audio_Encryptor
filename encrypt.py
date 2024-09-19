@@ -103,7 +103,8 @@ def main():
     block_size = 16  # Change as needed
 
     # Read the original audio file
-    input_file = 'input.wav'  # Input audio file path
+    # input_file = input("Please enter the file name you want to encrypt: \n")  # Input audio file path
+    input_file = "input.wav"
     params, audio_data = read_wav(input_file)
 
     # Divide audio into blocks
@@ -119,14 +120,14 @@ def main():
     encrypted_blocks = encrypt_blocks(public_key, blocks)
 
     # Save encrypted data
-    output_file = 'encrypted_data.bin'  # Encrypted file output path
+    output_file = 'encrypted_audio.bin'  # Encrypted file output path
     save_encrypted_data(output_file, encrypted_blocks, params, block_size, public_key)
 
     # Save private key to a separate file
     private_key_file = 'private_key.bin'
     save_private_key(private_key_file, private_key)
 
-    print(f"Encryption completed! The encrypted file has been save to {output_file}")
+    print(f"\nEncryption completed! The encrypted file has been save to {output_file}")
     print(f"Private key has been save to {private_key_file}")
 
 if __name__ == '__main__':

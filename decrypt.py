@@ -53,7 +53,7 @@ def write_wav(file_path, params, audio_data):
 # 6. Main process
 def main():
     # Encrypted data file path
-    encrypted_file = 'encrypted_data.bin'
+    encrypted_file = 'encrypted_audio.bin'
     # Private key file path
     private_key_file = 'private_key.bin'
 
@@ -77,7 +77,7 @@ def main():
     audio_data = reconstruct_audio_data(decrypted_blocks, block_size, total_samples)
 
     # Save decrypted audio file
-    output_file = 'decrypted_output.wav'
+    output_file = 'decrypted_audio.wav'
     write_wav(output_file, params, audio_data)
 
     print(f"\nDecryption complete! Decrypted audio file saved to {output_file}")
