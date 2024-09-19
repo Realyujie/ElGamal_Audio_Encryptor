@@ -1,8 +1,6 @@
 import numpy as np
 import wave
 
-from test_encrypt import decrypt_file
-
 
 # Read WAV file
 def read_wav(file_path):
