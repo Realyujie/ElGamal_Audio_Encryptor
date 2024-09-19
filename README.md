@@ -1,32 +1,38 @@
-# Audio Conversion Scripts
-This repository contains two Python scripts to convert between .wav audio files and binary files.
+# Audio Encryption and Decryption with ElGamal Algorithm
+This repository provides a Python implementation for encrypting and decrypting audio files (WAV format) using the ElGamal encryption algorithm. 
+
+## Overview
+The program splits the audio data into blocks, encrypts each block, and stores the encrypted data. Decryption reconstructs the original audio file, which is then compared with the original to verify the integrity of the encryption and decryption processes.
 
 ## Files
-wav_to_bytes.py: Converts a WAV file into a binary file.  
-bytes_to_wav.py: Converts a binary file back into a WAV file.  
+`encrypt.py:`
+* Reads a WAV audio file.  
+* Splits the audio data into blocks.  
+* Encrypts each block using the ElGamal encryption algorithm.  
+* Saves the encrypted data and the private key.
 
-## Before running
-Ensure you have the following Python packages installed:  
-**(1)pydub**  
-**(2)numpy**
+`decrypt.py:`
+* Loads the encrypted audio data and private key.
+* Decrypts the encrypted blocks.
+* Reconstructs the original audio file.
+* Validates the decrypted file by comparing it to the original audio file.
+
+`validate.py:`
+* Reads audio file parameters.
+* Validates whether the decrypted audio file matches the original audio file (ignoring the number of frames).
+
+## Required Python libraries:
+`numpy`
+`wave`
+`pickle`
+`secrets`
+`random`
+`sympy`
+
+### You can install the necessary libraries by running:
+
+    pip install numpy sympy
 
 ## Usage
-### Please enter the input path of wav file: 
-/path/to/testaudio.wav
-### Please enter the input path of binary file: 
-/path/to/output_audio.bin  
-### Please enter the output path of wav file: 
-/path/to/output/
-
-**You can ignore the RuntimeWarning as it can run normally.**
-
-## Attention
-Do not change the audio configurations (parameters) part, it has already been tested by Yujie and it works well.
-
-## About audio parameters
-For example, a 44.1kHz frequency, 16bits depth audio:  
-- 44100 times of sampling rate per second
-- Each sample is represented using 16 bits of binary
-- 2^16 = 65,536 possible values. The actual range is -32,768 to +32,767 (because 0 is included).
-- Each sample takes up 2 bytes. One second of audio data takes up: 44,100 * 2 = 88,200 bytes ≈ 86.13 KB.
-- For stereo, it's 172.27 KB/second
+To encrypt an audio file (input.wav), run the encrypt.py script.  
+To decrypt the encrypted audio file, run the decrypt.py script.
