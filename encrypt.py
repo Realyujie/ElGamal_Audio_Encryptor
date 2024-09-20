@@ -2,7 +2,6 @@ import wave
 import numpy as np
 import secrets
 import pickle
-import math
 import random
 from sympy import *
 
@@ -56,10 +55,13 @@ def key_generation(bits):
     g = find_generator(p, q)
     x = random.randint(2, p-2)  # private key
     y = pow(g, x, p)  # public key
-    print(p)
-    print(q)
-    print(x)
-    print(y)
+    """
+    check the number during test
+    print('The large prime number is ', p)
+    print('The generator of the multiplicative group is ', g)
+    print('The public key is ', y)
+    print('The private key is ', x)
+    """
     return (p, g, y), x
 
 # 4. Encryption
@@ -108,9 +110,6 @@ def main():
 
     # Divide audio into blocks
     blocks = divide_into_blocks(audio_data, block_size)
-
-    # Calculate bit length of each block
-    block_bit_length = 16 * block_size  # 16 bits per sample
 
     # Key generation
     public_key, private_key = key_generation(512)
